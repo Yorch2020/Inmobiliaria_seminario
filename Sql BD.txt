@@ -1,0 +1,178 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `InLaVilla` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `InLaVilla` ;
+
+-- -----------------------------------------------------
+-- Table `InLaVilla`.`Pl_Empleado`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Empleado` (
+  `id_empleado` INT NOT NULL,
+  `dpi` VARCHAR(45) NULL,
+  `nombre` VARCHAR(100) NULL,
+  `telefono` VARCHAR(45) NULL,
+  `direccion` VARCHAR(145) NULL,
+  `Pl_Recibo_idl_Recibo` INT NOT NULL,
+  PRIMARY KEY (`id_empleado`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `InLaVilla`.`Pl_Cliente`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Cliente` (
+  `id_Cliente` INT NOT NULL,
+  `nombre` VARCHAR(45) NULL,
+  `apellido` VARCHAR(45) NULL,
+  `telefono` VARCHAR(45) NULL,
+  `contacto` VARCHAR(45) NULL,
+  `observaciones` VARCHAR(400) NULL,
+  `direccion` VARCHAR(145) NULL,
+  PRIMARY KEY (`id_Cliente`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Pl_Zona`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Zona` (
+  `id_zona` INT NOT NULL,
+  `numero` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_zona`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Pl_Tipo_Direccion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Tipo_Direccion` (
+  `id_tipo_direccion` INT NOT NULL,
+  `descripcion` VARCHAR(200) NULL,
+  PRIMARY KEY (`id_tipo_direccion`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Pl_Direccion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Direccion` (
+  `id_Direccion` INT NOT NULL,
+  `calle` VARCHAR(45) NULL,
+  `avenida` VARCHAR(45) NULL,
+  `numero_casa` VARCHAR(45) NULL,
+  `id_zona` INT NOT NULL,
+  `id_tipo_direccion` INT NOT NULL,
+  PRIMARY KEY (`id_Direccion`, `id_zona`, `id_tipo_direccion`),
+  INDEX `fk_Pl_Direccion_Pl_Zona1_idx` (`id_zona` ASC),
+  INDEX `fk_Pl_Direccion_Pl_Tipo_Direccion1_idx` (`id_tipo_direccion` ASC),
+  CONSTRAINT `fk_Pl_Direccion_Pl_Zona1`
+    FOREIGN KEY (`id_zona`)
+    REFERENCES `mydb`.`Pl_Zona` (`id_zona`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Pl_Direccion_Pl_Tipo_Direccion1`
+    FOREIGN KEY (`id_tipo_direccion`)
+    REFERENCES `mydb`.`Pl_Tipo_Direccion` (`id_tipo_direccion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `InLaVilla`.`Pl_Concepto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Concepto` (
+  `id_concepto` INT NOT NULL,
+  `descripcion` VARCHAR(400) NULL,
+  PRIMARY KEY (`id_concepto`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `InLaVilla`.`Pl_Estado`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Estado` (
+  `id_estado` INT NOT NULL,
+  `descripcion` VARCHAR(400) NULL,
+  PRIMARY KEY (`id_estado`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `InLaVilla`.`Pl_Proyectos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Proyectos` (
+  `id_proyectos` INT NOT NULL,
+  `monto` DOUBLE NULL,
+  `descripcion` VARCHAR(400) NULL,
+  `id_Direccion` INT NOT NULL,
+  `id_concepto` INT NOT NULL,
+  `id_estado` INT NOT NULL,
+  PRIMARY KEY (`id_proyectos`, `id_Direccion`, `id_concepto`, `id_estado`),
+  INDEX `fk_Pl_Proyectos_Pl_Direccion1_idx` (`id_Direccion` ASC),
+  INDEX `fk_Pl_Proyectos_Pl_Concepto1_idx` (`id_concepto` ASC),
+  INDEX `fk_Pl_Proyectos_Pl_Estado1_idx` (`id_estado` ASC),
+  CONSTRAINT `fk_Pl_Proyectos_Pl_Direccion1`
+    FOREIGN KEY (`id_Direccion`)
+    REFERENCES `mydb`.`Pl_Direccion` (`id_Direccion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Pl_Proyectos_Pl_Concepto1`
+    FOREIGN KEY (`id_concepto`)
+    REFERENCES `mydb`.`Pl_Concepto` (`id_concepto`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Pl_Proyectos_Pl_Estado1`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `mydb`.`Pl_Estado` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `InLaVilla`.`Pl_Recibo`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `InLaVilla`.`Pl_Recibo` (
+  `idl_Recibo` INT NOT NULL,
+  `monto` DOUBLE NULL,
+  `fecha` DATETIME NULL,
+  `id_empleado` INT NOT NULL,
+  `Pl_Cliente_id_Cliente` INT NOT NULL,
+  `Pl_Proyectos_id_proyectos` INT NOT NULL,
+  PRIMARY KEY (`idl_Recibo`, `id_empleado`, `Pl_Cliente_id_Cliente`, `Pl_Proyectos_id_proyectos`),
+  INDEX `fk_Pl_Recibo_Pl_Empleado_idx` (`id_empleado` ASC),
+  INDEX `fk_Pl_Recibo_Pl_Cliente1_idx` (`Pl_Cliente_id_Cliente` ASC),
+  INDEX `fk_Pl_Recibo_Pl_Proyectos1_idx` (`Pl_Proyectos_id_proyectos` ASC),
+  CONSTRAINT `fk_Pl_Recibo_Pl_Empleado`
+    FOREIGN KEY (`id_empleado`)
+    REFERENCES `mydb`.`Pl_Empleado` (`id_empleado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Pl_Recibo_Pl_Cliente1`
+    FOREIGN KEY (`Pl_Cliente_id_Cliente`)
+    REFERENCES `mydb`.`Pl_Cliente` (`id_Cliente`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Pl_Recibo_Pl_Proyectos1`
+    FOREIGN KEY (`Pl_Proyectos_id_proyectos`)
+    REFERENCES `mydb`.`Pl_Proyectos` (`id_proyectos`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
